@@ -12,14 +12,19 @@ class ExpenseCubit extends Cubit<ExpenseState> {
       category: category,
       id: DateTime.now().toIso8601String(),
     );
-    final upadatedEps = [...state.expenses, newExpense];
-    emit(state.copyWith(expenses: upadatedEps));
+    final updatedEpns = state.expenses.toList();
+    updatedEpns.add(newExpense);
+    emit(state.copyWith(expenses: updatedEpns));
   }
 
   void deleteExpense(String id) {
-    final upadatedEps =
-        state.expenses.where((expense) => expense.id != id).toList();
-    emit(state.copyWith(expenses: upadatedEps));
+    for (int i = 0; i < state.expenses.length; i++) {
+      if (state.expenses[i].id == id) {
+        state.expenses.removeAt(i);
+        break;
+      }
+    }
+    emit(state.copyWith(expenses: state.expenses));
   }
 
   void changeFilter(CategoryFilter category) {
