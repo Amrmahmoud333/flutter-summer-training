@@ -1,5 +1,7 @@
+import 'package:expense/cubit/expense_cubit.dart';
 import 'package:expense/screens/expense_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
@@ -15,13 +17,16 @@ class MyApp extends StatelessWidget {
       designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Expense App',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      child: BlocProvider(
+        create: (_) => ExpenseCubit(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Expense App',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          ),
+          home: const ExpenseScreen(),
         ),
-        home: const ExpenseScreen(),
       ),
     );
   }
