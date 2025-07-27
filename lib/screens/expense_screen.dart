@@ -1,5 +1,6 @@
 import 'package:expense/cubit/expense_cubit.dart';
 import 'package:expense/cubit/expense_state.dart';
+import 'package:expense/cubit/theme_cubit.dart';
 import 'package:expense/models/expense_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,6 +34,19 @@ class ExpenseScreen extends StatelessWidget {
                     context.read<ExpenseCubit>().changeFilter(newFilter);
                   }
                 },
+              );
+            },
+          ),
+
+          BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, state) {
+              return IconButton(
+                onPressed: () {
+                  context.read<ThemeCubit>().switchTheme();
+                },
+                icon: Icon(
+                  state == ThemeMode.light ? Icons.dark_mode : Icons.light_mode,
+                ),
               );
             },
           ),
