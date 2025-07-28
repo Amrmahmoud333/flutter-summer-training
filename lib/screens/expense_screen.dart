@@ -17,24 +17,27 @@ class ExpenseScreen extends StatelessWidget {
         actions: [
           BlocBuilder<ExpenseCubit, ExpenseState>(
             builder: (context, state) {
-              return DropdownButton<CategoryFilter>(
-                items:
-                    CategoryFilter.values.map((filter) {
-                      return DropdownMenuItem(
-                        value: filter,
-                        child: Text(
-                          filter.name[0].toUpperCase() +
-                              filter.name.substring(1),
-                        ),
-                      );
-                    }).toList(),
-                value: state.filter,
-                onChanged: (newFilter) {
-                  if (newFilter != null) {
-                    context.read<ExpenseCubit>().changeFilter(newFilter);
-                  }
-                },
-              );
+              if (state is LoadedExpenseState) {
+                return DropdownButton<CategoryFilter>(
+                  items:
+                      CategoryFilter.values.map((filter) {
+                        return DropdownMenuItem(
+                          value: filter,
+                          child: Text(
+                            filter.name[0].toUpperCase() +
+                                filter.name.substring(1),
+                          ),
+                        );
+                      }).toList(),
+                  value: state.filter,
+                  onChanged: (newFilter) {
+                    if (newFilter != null) {
+                      context.read<ExpenseCubit>().changeFilter(newFilter);
+                    }
+                  },
+                );
+              }
+              return const SizedBox();
             },
           ),
 
@@ -56,54 +59,64 @@ class ExpenseScreen extends StatelessWidget {
         width: double.infinity,
         child: BlocBuilder<ExpenseCubit, ExpenseState>(
           builder: (context, state) {
-            return Column(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text('Total Amount ${state.totalAmount}'),
+            if (state is LoadingExpenseState || state is InitialExpenseState) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is ExpenseErrorState) {
+              return Center(child: Text('Error: ${state.errorMessage}'));
+            }
+            if (state is LoadedExpenseState) {
+              return Column(
+                children: [
+                  Card(
+                    margin: const EdgeInsets.all(16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text('Total Amount ${state.totalAmount}'),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: state.filteredExpenses.length,
-                    itemBuilder: (context, index) {
-                      final exps = state.filteredExpenses[index];
-                      return Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Icon(Icons.monetization_on),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: state.filteredExpenses.length,
+                      itemBuilder: (context, index) {
+                        final exps = state.filteredExpenses[index];
+                        return Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Icon(Icons.monetization_on),
 
-                              Column(
-                                children: [
-                                  Text(exps.title),
-                                  Text(exps.category.name),
-                                ],
-                              ),
+                                Column(
+                                  children: [
+                                    Text(exps.title),
+                                    Text(exps.category.name),
+                                  ],
+                                ),
 
-                              Text('\$ ${exps.amount}'),
+                                Text('\$ ${exps.amount}'),
 
-                              IconButton(
-                                onPressed: () {
-                                  context.read<ExpenseCubit>().deleteExpense(
-                                    exps.id,
-                                  );
-                                },
-                                icon: const Icon(Icons.delete),
-                              ),
-                            ],
+                                IconButton(
+                                  onPressed: () {
+                                    context.read<ExpenseCubit>().deleteExpense(
+                                      exps.id,
+                                    );
+                                  },
+                                  icon: const Icon(Icons.delete),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
-            );
+                ],
+              );
+            } else {
+              return SizedBox();
+            }
           },
         ),
       ),

@@ -2,11 +2,26 @@ import 'package:expense/models/expense_model.dart';
 
 enum CategoryFilter { all, food, transport, fun, other }
 
-class ExpenseState {
+abstract class ExpenseState {}
+
+class InitialExpenseState extends ExpenseState {}
+
+class LoadingExpenseState extends ExpenseState {}
+
+class ExpenseErrorState extends ExpenseState {
+  final String errorMessage;
+
+  ExpenseErrorState(this.errorMessage);
+}
+
+class LoadedExpenseState extends ExpenseState {
   final List<ExpenseModel> expenses;
   final CategoryFilter filter;
 
-  ExpenseState({this.expenses = const [], this.filter = CategoryFilter.all});
+  LoadedExpenseState({
+    this.expenses = const [],
+    this.filter = CategoryFilter.all,
+  });
 
   List<ExpenseModel> get filteredExpenses {
     List<ExpenseModel> filtered = [];
@@ -51,11 +66,11 @@ class ExpenseState {
     return sum;
   }
 
-  ExpenseState copyWith({
+  LoadedExpenseState copyWith({
     List<ExpenseModel>? expenses,
     CategoryFilter? filter,
   }) {
-    return ExpenseState(
+    return LoadedExpenseState(
       expenses: expenses ?? this.expenses,
       filter: filter ?? this.filter,
     );
